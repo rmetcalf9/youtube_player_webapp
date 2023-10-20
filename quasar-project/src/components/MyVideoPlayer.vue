@@ -14,7 +14,7 @@
         @playing="handleEvent($event)"
         @canplay="handleEvent($event)"
         @canplaythrough="handleEvent($event)"
-    />
+    />{{ stats.milisecondsWatched }} {{ calcWatchDuration }}
   </div>
 </template>
 
@@ -54,6 +54,9 @@ export default defineComponent({
   },
   data() {
     return {
+      stats: {
+        milisecondsWatched: 0
+      },
       playerOptions: {
         autoplay: false,
         controls: true,
@@ -64,11 +67,69 @@ export default defineComponent({
             src: 'https://www.youtube.com/watch?v=W3s2YdgaS5E',
           }
         ]
+      },
+      calcWatchDuration: {
+        currentlyPlaying: false,
+        lastStatePlaying: false,
+        lastTime: undefined,
+        playMonitorRunning: false,
+        playMonitor: undefined
       }
     };
   },
+  mounted() {
+    this.startPlayMonitorIfNeeded()
+  },
+  unmount() {
+    this.stopPlayMonitor()
+  },
   methods: {
+    startPlayMonitorIfNeeded() {
+      if (this.playMonitorRunning) {
+        return
+      }
+      this.playMonitorRunning = true
+      this.playMonitor = setInterval(() => {
+        this.updateWatchDuration()
+      }, 1000)
+    },
+    stopPlayMonitor() {
+      clearInterval(this.playMonitor)
+      this.playMonitorRunning = false
+    },
+    updateWatchDuration() {
+      const curTime = Date.now()
+      if (this.calcWatchDuration.currentlyPlaying) {
+        if (this.calcWatchDuration.lastStatePlaying) {
+          this.stats.milisecondsWatched += (curTime - this.calcWatchDuration.lastTime)
+        }
+      } else {
+        // not currently playing
+        if (this.calcWatchDuration.lastStatePlaying) {
+          this.stats.milisecondsWatched += (curTime - this.calcWatchDuration.lastTime)
+        }
+      }
+      this.calcWatchDuration.lastTime = curTime
+      this.calcWatchDuration.lastStatePlaying = this.calcWatchDuration.currentlyPlaying
+    },
+    isPlayingEventType(eventType) {
+      if (eventType === 'playing') {
+        return true
+      }
+      if (eventType === 'play') {
+        return true
+      }
+      return false
+    },
     handleEvent(event) {
+      if (this.isPlayingEventType(event.type)) {
+        this.calcWatchDuration.currentlyPlaying = true
+        this.startPlayMonitorIfNeeded()
+      } else {
+        this.calcWatchDuration.currentlyPlaying = false
+        this.stopPlayMonitor()
+      }
+      this.updateWatchDuration()
       console.log('TODO handle event', event)
     },
     play() {

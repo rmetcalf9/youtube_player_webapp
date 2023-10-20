@@ -2,6 +2,7 @@
   <q-page>
     <MyVideoPlayer
       ref="myVideoPlayer"
+      :stats="player_stats"
     />
     <q-btn
       @click="$refs.myVideoPlayer.play()"
@@ -28,6 +29,7 @@ export default defineComponent({
   },
   data() {
     return {
+      player_stats: {}
     };
   },
   methods: {
