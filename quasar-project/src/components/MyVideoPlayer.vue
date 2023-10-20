@@ -61,7 +61,8 @@ export default defineComponent({
   data() {
     return {
       stats: {
-        milisecondsWatched: 0
+        milisecondsWatched: 0,
+        vidplaying: undefined
       },
       playerOptions: {
         autoplay: false,
@@ -70,7 +71,7 @@ export default defineComponent({
         sources: [
           {
             type: 'video/youtube',
-            src: 'https://www.youtube.com/watch?v=W3s2YdgaS5E',
+            src: undefined,
           }
         ]
       },
@@ -124,7 +125,7 @@ export default defineComponent({
       }
       if (this.stats.milisecondsWatched > this.considerWatchedThreashhold) {
         this.calcWatchDuration.consideredWatched = true
-        this.$emit('consideredwatched') // TODO Pass out video ID???
+        this.emitConsiderWatched()
       }
     },
     isPlayingEventType(eventType) {
@@ -135,6 +136,9 @@ export default defineComponent({
         return true
       }
       return false
+    },
+    emitConsiderWatched() {
+      this.$emit('consideredwatched', {src: this.stats.vidplaying})
     },
     handleEvent(event) {
       if (this.isPlayingEventType(event.type)) {
@@ -148,7 +152,7 @@ export default defineComponent({
       if (event.type === 'ended') {
         if (!this.calcWatchDuration.consideredWatched) {
           this.calcWatchDuration.consideredWatched = true
-          this.$emit('consideredwatched') // TODO Pass out video ID???
+          this.emitConsiderWatched()
         }
         this.$emit('ended')
       }
@@ -158,6 +162,27 @@ export default defineComponent({
     },
     pause() {
       this.player.value.pause()
+    },
+    playSrc(type, src) {
+      this.stopPlayMonitor()
+      this.stats = {
+        milisecondsWatched: 0,
+        vidplaying: {
+          type: type,
+          src: src,
+        }
+      }
+      this.calcWatchDuration = {
+        currentlyPlaying: false,
+        lastStatePlaying: false,
+        lastTime: undefined,
+        playMonitorRunning: false,
+        playMonitor: undefined,
+        consideredWatched: false
+      }
+
+      this.player.value.src([this.stats.vidplaying])
+      this.player.value.play()
     }
   }
 })
