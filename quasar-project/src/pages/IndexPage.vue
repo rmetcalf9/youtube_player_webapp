@@ -51,7 +51,7 @@ export default defineComponent({
       console.log('TODO Mark this video as watched', src)
     },
     onEnded () {
-      console.log('TODO Process ended')
+      this.onNext()
     },
     onNext() {
       if (typeof (this.playlistCounter) === 'undefined') {
