@@ -4,6 +4,7 @@
         class="wholePage"
         ref="videoPlayer"
         :options="playerOptions"
+        @mounted="handleMounted"
         @ready="handleEvent($event)"
         @play="handleEvent($event)"
         @pause="handleEvent($event)"
@@ -26,8 +27,7 @@ import { VideoPlayer } from '@videojs-player/vue'
 import 'video.js/dist/video-js.css'
 import 'videojs-youtube/dist/Youtube.min.js'
 
-// import { shallowRef } from 'vue'
-// type VideoJsPlayer = ReturnType<typeof videojs>
+import videojs from 'video.js';
 
 export default defineComponent({
   name: 'MyVideoPlayer',
@@ -43,16 +43,17 @@ export default defineComponent({
     VideoPlayer
   },
   setup() {
-    // const player = shallowRef<VideoJsPlayer>()
-    // const handleMounted = (payload: any) => {
-    //  player.value = payload.player
-    //  console.log('Basic player mounted', payload)
-    //}
-    // return { player, handleMounted }
+    const player = {
+      value: undefined
+    }
+    const handleMounted = (payload) => {
+      player.value = payload.player
+    }
+
+    return {player, handleMounted}
   },
   data() {
     return {
-      player: null,
       playerOptions: {
         autoplay: false,
         controls: true,
@@ -66,13 +67,15 @@ export default defineComponent({
       }
     };
   },
-  mounted() {
-  },
-  beforeUnmount() {
-  },
   methods: {
     handleEvent(event) {
       console.log('TODO handle event', event)
+    },
+    play() {
+      this.player.value.play()
+    },
+    pause() {
+      this.player.value.pause()
     }
   }
 })

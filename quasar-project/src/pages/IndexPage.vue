@@ -1,11 +1,17 @@
 <template>
   <q-page>
     <MyVideoPlayer
+      ref="myVideoPlayer"
     />
     <q-btn
-      @click="onPressBtn"
+      @click="$refs.myVideoPlayer.play()"
       color="primary"
-      label="Test Button"
+      label="Play"
+    />
+    <q-btn
+      @click="$refs.myVideoPlayer.pause()"
+      color="primary"
+      label="Pause"
     />
   </q-page>
 </template>
@@ -25,8 +31,8 @@ export default defineComponent({
     };
   },
   methods: {
-    onPressBtn () {
-      console.log('onpressbtn')
+    ttty () {
+      console.log('ttt')
     }
   }
 })
