@@ -4,9 +4,15 @@
         class="wholePage"
         ref="videoPlayer"
         :options="playerOptions"
-        @play="onPlay"
-        @pause="onPause"
-        @ended="onEnded"
+        @ready="handleEvent($event)"
+        @play="handleEvent($event)"
+        @pause="handleEvent($event)"
+        @ended="handleEvent($event)"
+        @loadeddata="handleEvent($event)"
+        @waiting="handleEvent($event)"
+        @playing="handleEvent($event)"
+        @canplay="handleEvent($event)"
+        @canplaythrough="handleEvent($event)"
     />
   </div>
 </template>
@@ -15,11 +21,15 @@
 // npm install video.js @videojs-player/vue videojs-youtube --save
 // https://github.com/videojs/videojs-youtube
 // https://docs.videojs.com/
+import { defineComponent } from 'vue'
 import { VideoPlayer } from '@videojs-player/vue'
 import 'video.js/dist/video-js.css'
 import 'videojs-youtube/dist/Youtube.min.js'
 
-export default {
+// import { shallowRef } from 'vue'
+// type VideoJsPlayer = ReturnType<typeof videojs>
+
+export default defineComponent({
   name: 'MyVideoPlayer',
   props: {
     options: {
@@ -31,6 +41,14 @@ export default {
   },
   components: {
     VideoPlayer
+  },
+  setup() {
+    // const player = shallowRef<VideoJsPlayer>()
+    // const handleMounted = (payload: any) => {
+    //  player.value = payload.player
+    //  console.log('Basic player mounted', payload)
+    //}
+    // return { player, handleMounted }
   },
   data() {
     return {
@@ -53,17 +71,11 @@ export default {
   beforeUnmount() {
   },
   methods: {
-    onEnded() {
-      console.log('onEnded')
-    },
-    onPlay() {
-      console.log('onPlay')
-    },
-    onPause() {
-      console.log('onPause')
-    },
+    handleEvent(event) {
+      console.log('TODO handle event', event)
+    }
   }
-}
+})
 </script>
 
 <style lang="scss" scoped>
