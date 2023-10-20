@@ -14,7 +14,7 @@
         @playing="handleEvent($event)"
         @canplay="handleEvent($event)"
         @canplaythrough="handleEvent($event)"
-    />{{ stats.milisecondsWatched }} {{ calcWatchDuration }}
+    />{{ stats.milisecondsWatched }} {{ calcWatchDuration }} {{ considerWatchedThreashhold }}
   </div>
 </template>
 
@@ -36,6 +36,12 @@ export default defineComponent({
       type: Object,
       default() {
         return {};
+      }
+    },
+    considerWatchedThreashhold: {
+      type: Number,
+      default() {
+        return 10000
       }
     }
   },
@@ -73,7 +79,8 @@ export default defineComponent({
         lastStatePlaying: false,
         lastTime: undefined,
         playMonitorRunning: false,
-        playMonitor: undefined
+        playMonitor: undefined,
+        consideredWatched: false
       }
     };
   },
@@ -111,6 +118,14 @@ export default defineComponent({
       }
       this.calcWatchDuration.lastTime = curTime
       this.calcWatchDuration.lastStatePlaying = this.calcWatchDuration.currentlyPlaying
+
+      if (this.calcWatchDuration.consideredWatched) {
+        return
+      }
+      if (this.stats.milisecondsWatched > this.considerWatchedThreashhold) {
+        this.calcWatchDuration.consideredWatched = true
+        this.$emit('consideredwatched') // TODO Pass out video ID???
+      }
     },
     isPlayingEventType(eventType) {
       if (eventType === 'playing') {
@@ -130,7 +145,13 @@ export default defineComponent({
         this.stopPlayMonitor()
       }
       this.updateWatchDuration()
-      console.log('TODO handle event', event)
+      if (event.type === 'ended') {
+        if (!this.calcWatchDuration.consideredWatched) {
+          this.calcWatchDuration.consideredWatched = true
+          this.$emit('consideredwatched') // TODO Pass out video ID???
+        }
+        this.$emit('ended')
+      }
     },
     play() {
       this.player.value.play()

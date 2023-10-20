@@ -3,6 +3,9 @@
     <MyVideoPlayer
       ref="myVideoPlayer"
       :stats="player_stats"
+      considerWatchedThreashhold="10001"
+      @consideredwatched="markVidWatched"
+      @ended="onEnded"
     />
     <q-btn
       @click="$refs.myVideoPlayer.play()"
@@ -33,8 +36,11 @@ export default defineComponent({
     };
   },
   methods: {
-    ttty () {
-      console.log('ttt')
+    markVidWatched () {
+      console.log('TODO Mark this video as watched')
+    },
+    onEnded () {
+      console.log('TODO Process ended')
     }
   }
 })
