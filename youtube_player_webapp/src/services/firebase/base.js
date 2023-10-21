@@ -1,3 +1,4 @@
+/* eslint-disable */
 import firebase from 'firebase/app'
 import 'firebase/auth'
 
@@ -96,11 +97,10 @@ export const logoutUser = () => {
   return auth().signOut()
 }
 
-
 /**
  * Returns Firebase's server timestamp
  * @returns {ts} - The Firebase timestamp
  */
- export const timestamp = () => {
+export const timestamp = () => {
   return firebase.firestore.Timestamp.fromDate(new Date())
 }
