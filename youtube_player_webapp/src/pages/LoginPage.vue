@@ -56,7 +56,7 @@ export default defineComponent({
   },
   methods: {
     googleLoginUser () {
-      console.log('TODO launch google login')
+      console.log('TODO launch google login', this.$gapi)
     }
   }
 
