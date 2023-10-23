@@ -14,25 +14,6 @@
               Youtube Playlist Player
             </div>
               <div class="row justify-center">
-                <div class='col-12 q-py-sm q-px-lg'>
-                  <q-btn
-                    unelevated
-                    rounded
-                    class="full-width"
-                    style="height:50px;"
-                    text-color='grey-8'
-                    color="white"
-                    @click="googleLoginUser()"
-                    >
-                    <q-icon
-                      left
-                      class='fa-google-g-new'
-                      name='fab fa-google' />
-                    <q-space />
-                    Sign in with Google
-                    <q-space />
-                  </q-btn>
-                </div>
               </div>
 
           </q-page>
@@ -54,9 +35,33 @@ export default defineComponent({
   setup () {
     return { }
   },
+  data () {
+    return {
+    }
+  },
   methods: {
+    callback (resp) {
+      console.log('SSS cb', resp)
+    },
+    signInCallback (responseFromGoogle) {
+      const profile = responseFromGoogle.getBasicProfile()
+      console.log('ID: ' + profile.getId()) // Do not send to your backend! Use an ID token instead.
+      console.log('Name: ' + profile.getName())
+      console.log('Image URL: ' + profile.getImageUrl())
+      console.log('Email: ' + profile.getEmail()) // This is null if the 'email' scope is not present.
+    },
     googleLoginUser () {
-      console.log('TODO launch google login', this.$gapi)
+      const TTT = this
+      const auth2 = TTT.$gapi.auth2.init({
+        client_id: '878288378696-8gb7jntrjdqljjk9fjfdc2io3ojtrrpg.apps.googleusercontent.com',
+        // Scopes to request in addition to 'profile' and 'email'
+        scope: 'https://www.googleapis.com/auth/youtube'
+      }, TTT.signInError, TTT.signInError)
+      auth2.signIn().then(TTT.signInCallback, TTT.signInError)
+      // auth2.grantOfflineAccess().then(TTT.signInCallback, TTT.signInError)
+    },
+    googleLoginError (param) {
+      console.log('Login Error', param)
     }
   }
 
