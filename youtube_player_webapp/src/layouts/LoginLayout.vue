@@ -41,6 +41,7 @@
 <script>
 // https://developers.google.com/identity/gsi/web/tools/configurator
 import { defineComponent } from 'vue'
+import apikeys from '../apikey.js'
 
 window.handleCredentialResponse = (response) => {
   window.loginlayoutvuecomponent.loginCallback(response)
@@ -69,9 +70,8 @@ export default defineComponent({
         client_id: '878288378696-8gb7jntrjdqljjk9fjfdc2io3ojtrrpg.apps.googleusercontent.com',
         scope: 'https://www.googleapis.com/auth/youtube',
         callback: (tokenResponse) => {
-          TTT.$gapi.client.setApiKey('AIzaSyDt0sTDwR7F_ugYRH4q8RqfjlrahbCS09I')
+          TTT.$gapi.client.setApiKey(apikeys.google_api_key)
           TTT.$gapi.client.load('youtube', 'v3', TTT.postLoad)
-          console.log('xxx')
         }
       })
       client.requestAccessToken()
@@ -94,7 +94,7 @@ export default defineComponent({
       const TTT = this
       console.log('gapi', this.$gapi)
       this.$gapi.client.init({
-        apiKey: 'AIzaSyDt0sTDwR7F_ugYRH4q8RqfjlrahbCS09I',
+        apiKey: apikeys.google_api_key,
         // Your API key will be automatically added to the Discovery Document URLs.
         discoveryDocs: ['https://people.googleapis.com/$discovery/rest'],
         // clientId and scope are optional if auth is not required.
