@@ -78,6 +78,17 @@ export default defineComponent({
     },
     postLoad () {
       console.log('PostLoad')
+      const request = this.$gapi.client.youtube.playlists.list({
+        part: 'snippet,contentDetails',
+        mine: true
+      })
+      request.then(this.gotPlaylistList, this.gotError)
+    },
+    gotPlaylistList (resp) {
+      console.log('PLL', resp)
+    },
+    gotError (resp) {
+      console.log('We got an error', resp)
     },
     tmpCallListPlaylists2 (auth) {
       const TTT = this
