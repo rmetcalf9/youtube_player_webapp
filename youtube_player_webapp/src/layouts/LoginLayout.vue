@@ -58,8 +58,68 @@ export default defineComponent({
   methods: {
     loginCallback (resp) {
       console.log('Callback inside vue component', resp)
-      console.log('sss', this.$router.push)
-      this.$router.push('/playlists')
+      // this.$router.push('/playlists')
+      // this.tmpCallListPlaylists2(resp)
+      this.tmpCallTokenStuff()
+    },
+    tmpCallTokenStuff () {
+      console.log('initTokenClient')
+      const TTT = this
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: '878288378696-8gb7jntrjdqljjk9fjfdc2io3ojtrrpg.apps.googleusercontent.com',
+        scope: 'https://www.googleapis.com/auth/youtube',
+        callback: (tokenResponse) => {
+          TTT.$gapi.client.setApiKey('AIzaSyDt0sTDwR7F_ugYRH4q8RqfjlrahbCS09I')
+          TTT.$gapi.client.load('youtube', 'v3', TTT.postLoad)
+          console.log('xxx')
+        }
+      })
+      client.requestAccessToken()
+    },
+    postLoad () {
+      console.log('PostLoad')
+    },
+    tmpCallListPlaylists2 (auth) {
+      const TTT = this
+      console.log('gapi', this.$gapi)
+      this.$gapi.client.init({
+        apiKey: 'AIzaSyDt0sTDwR7F_ugYRH4q8RqfjlrahbCS09I',
+        // Your API key will be automatically added to the Discovery Document URLs.
+        discoveryDocs: ['https://people.googleapis.com/$discovery/rest'],
+        // clientId and scope are optional if auth is not required.
+        clientId: auth.clientId,
+        scope: 'profile'
+      }).then(function () {
+        // 3. Initialize and make the API request.
+        return TTT.$gapi.client.people.people.get({
+          resourceName: 'people/me',
+          'requestMask.includeField': 'person.names'
+        })
+      }).then(function (response) {
+        console.log(response.result)
+      }, function (reason) {
+        console.log('Error: ' + reason.result.error.message)
+      })
+    },
+    tmpCallListPlaylists (auth) {
+      console.log('calling list pl', auth)
+      const config = {
+        method: 'GET',
+        url: 'https://www.googleapis.com/youtube/v3/playlists',
+        data: { },
+        params: {
+          part: 'snippet,contentDetails',
+          mine: true
+        },
+        headers: {
+          Authorization: 'Bearer ' + auth.credential
+        }
+      }
+      console.log('config', config)
+      this.$axios(config).then(
+        (response) => {
+          console.log('RESP', response)
+        })
     }
   },
   mounted: function () {
