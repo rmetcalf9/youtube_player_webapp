@@ -69,7 +69,24 @@ export default defineComponent({
   },
   data () {
     return {
-      googleplaylistresults: []
+      googleplaylistresults: [],
+      googlePlaylistData: {
+        watchLater: {
+          nameToSearchFor: 'My Watch Later',
+          playlistData: undefined,
+          playlistItems: undefined
+        },
+        watchNow: {
+          nameToSearchFor: 'Watch Now',
+          playlistData: undefined,
+          playlistItems: undefined
+        },
+        longWatchLater: {
+          nameToSearchFor: 'Long Watch Later',
+          playlistData: undefined,
+          playlistItems: undefined
+        }
+      }
     }
   },
   methods: {
@@ -108,25 +125,33 @@ export default defineComponent({
       })
     },
     gotPlaylistList () {
-      let watchLater
-      let watchNow
-      let longWatchLater
+      this.googlePlaylistData.watchLater.playlistData = undefined
+      this.googlePlaylistData.watchNow.playlistData = undefined
+      this.googlePlaylistData.longWatchLater.playlistData = undefined
+      this.googlePlaylistData.watchLater.playlistItems = undefined
+      this.googlePlaylistData.watchNow.playlistItems = undefined
+      this.googlePlaylistData.longWatchLater.playlistItems = undefined
 
       for (const key in Object.keys(this.googleplaylistresults[0])) {
         const playlist = this.googleplaylistresults[0][key]
-        if (playlist.snippet.title === 'My Watch Later') {
-          watchLater = playlist
-        }
-        if (playlist.snippet.title === 'Watch Now') {
-          watchNow = playlist
-        }
-        if (playlist.snippet.title === 'Long Watch Later') {
-          longWatchLater = playlist
+
+        for (const pldkeyidx in Object.keys(this.googlePlaylistData)) {
+          const pldkey = Object.keys(this.googlePlaylistData)[pldkeyidx]
+          const plditem = this.googlePlaylistData[pldkey]
+          if (playlist.snippet.title === plditem.nameToSearchFor) {
+            plditem.playlistData = playlist
+          }
         }
       }
-      console.log('watchLater', watchLater)
-      console.log('watchNow', watchNow)
-      console.log('longWatchLater', longWatchLater)
+      for (const pldkeyidx in Object.keys(this.googlePlaylistData)) {
+        const pldkey = Object.keys(this.googlePlaylistData)[pldkeyidx]
+        const plditem = this.googlePlaylistData[pldkey]
+        if (typeof (plditem.playlistData) === 'undefined') {
+          console.log('ERROR playlist not found aborting', plditem.nameToSearchFor)
+          return
+        }
+      }
+      console.log('Sucessfully got playlists - now loading the items')
     },
     gotError (resp) {
       console.log('We got an error', resp)
