@@ -34,6 +34,13 @@
               <q-btn
                 @click="autoriseWithGoogle"
                 color="primary"
+                label="Auth with google"
+                class = "float-right q-ml-xs"
+              ></q-btn>
+
+              <q-btn
+                @click="scanGooglePlaylists"
+                color="primary"
                 label="Scan Playlists"
                 class = "float-right q-ml-xs"
               ></q-btn>
@@ -49,6 +56,7 @@
 // https://developers.google.com/identity/gsi/web/tools/configurator
 import { defineComponent } from 'vue'
 import apikeys from '../apikey.js'
+import googleApiHelpers from '../googleApiHelpers.js'
 
 window.handleCredentialResponse = (response) => {
   window.loginlayoutvuecomponent.loginCallback(response)
@@ -61,6 +69,7 @@ export default defineComponent({
   },
   data () {
     return {
+      googleplaylistresults: []
     }
   },
   methods: {
@@ -76,21 +85,30 @@ export default defineComponent({
         scope: 'https://www.googleapis.com/auth/youtube',
         callback: (tokenResponse) => {
           TTT.$gapi.client.setApiKey(apikeys.google_api_key)
-          TTT.$gapi.client.load('youtube', 'v3', TTT.postAutoriseWithGoogle)
+          TTT.$gapi.client.load('youtube', 'v3', TTT.scanGooglePlaylists)
         }
       })
       client.requestAccessToken()
     },
-    postAutoriseWithGoogle () {
-      console.log('postAutoriseWithGoogle')
-      const request = this.$gapi.client.youtube.playlists.list({
-        part: 'snippet,contentDetails',
-        mine: true
+    scanGooglePlaylists () {
+      if (typeof (this.$gapi.client.youtube) === 'undefined') {
+        this.autoriseWithGoogle()
+        return
+      }
+      this.googleplaylistresults = []
+      googleApiHelpers.collectGoogleApiListResults({
+        collectionArray: this.googleplaylistresults,
+        apiFn: this.$gapi.client.youtube.playlists.list,
+        params: {
+          part: 'snippet,contentDetails',
+          mine: true
+        },
+        errorCallback: this.gotError,
+        sucessfullCompletionCallback: this.gotPlaylistList
       })
-      request.then(this.gotPlaylistList, this.gotError)
     },
-    gotPlaylistList (resp) {
-      console.log('PLL', resp)
+    gotPlaylistList () {
+      console.log('gotPlaylistList', this.googleplaylistresults)
     },
     gotError (resp) {
       console.log('We got an error', resp)

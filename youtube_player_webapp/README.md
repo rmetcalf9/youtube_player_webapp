@@ -31,3 +31,9 @@ quasar build
 
 ### Customize the configuration
 See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js).
+
+
+### References
+
+Google javascript API - https://github.com/google/google-api-javascript-client
+YOutube data API - https://developers.google.com/youtube/v3/docs
