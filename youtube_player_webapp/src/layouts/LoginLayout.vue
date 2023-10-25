@@ -108,7 +108,25 @@ export default defineComponent({
       })
     },
     gotPlaylistList () {
-      console.log('gotPlaylistList', this.googleplaylistresults)
+      let watchLater
+      let watchNow
+      let longWatchLater
+
+      for (const key in Object.keys(this.googleplaylistresults[0])) {
+        const playlist = this.googleplaylistresults[0][key]
+        if (playlist.snippet.title === 'My Watch Later') {
+          watchLater = playlist
+        }
+        if (playlist.snippet.title === 'Watch Now') {
+          watchNow = playlist
+        }
+        if (playlist.snippet.title === 'Long Watch Later') {
+          longWatchLater = playlist
+        }
+      }
+      console.log('watchLater', watchLater)
+      console.log('watchNow', watchNow)
+      console.log('longWatchLater', longWatchLater)
     },
     gotError (resp) {
       console.log('We got an error', resp)
