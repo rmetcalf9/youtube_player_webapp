@@ -14,7 +14,7 @@
             Youtube Playlist Player
           </div>
             <div class="row justify-center">
-              <div id="g_id_onload"
+              <!-- <div id="g_id_onload"
                    data-client_id="878288378696-8gb7jntrjdqljjk9fjfdc2io3ojtrrpg.apps.googleusercontent.com"
                    data-context="signin"
                    data-ux_mode="popup"
@@ -29,7 +29,14 @@
                    data-text="signin_with"
                    data-size="large"
                    data-logo_alignment="left">
-              </div>
+              </div>-->
+
+              <q-btn
+                @click="autoriseWithGoogle"
+                color="primary"
+                label="Scan Playlists"
+                class = "float-right q-ml-xs"
+              ></q-btn>
             </div>
         </q-page>
       </q-page-container>
@@ -58,26 +65,24 @@ export default defineComponent({
   },
   methods: {
     loginCallback (resp) {
-      console.log('Callback inside vue component', resp)
       // this.$router.push('/playlists')
       // this.tmpCallListPlaylists2(resp)
-      this.tmpCallTokenStuff()
+      this.autoriseWithGoogle()
     },
-    tmpCallTokenStuff () {
-      console.log('initTokenClient')
+    autoriseWithGoogle () {
       const TTT = this
       const client = window.google.accounts.oauth2.initTokenClient({
         client_id: '878288378696-8gb7jntrjdqljjk9fjfdc2io3ojtrrpg.apps.googleusercontent.com',
         scope: 'https://www.googleapis.com/auth/youtube',
         callback: (tokenResponse) => {
           TTT.$gapi.client.setApiKey(apikeys.google_api_key)
-          TTT.$gapi.client.load('youtube', 'v3', TTT.postLoad)
+          TTT.$gapi.client.load('youtube', 'v3', TTT.postAutoriseWithGoogle)
         }
       })
       client.requestAccessToken()
     },
-    postLoad () {
-      console.log('PostLoad')
+    postAutoriseWithGoogle () {
+      console.log('postAutoriseWithGoogle')
       const request = this.$gapi.client.youtube.playlists.list({
         part: 'snippet,contentDetails',
         mine: true
@@ -89,48 +94,6 @@ export default defineComponent({
     },
     gotError (resp) {
       console.log('We got an error', resp)
-    },
-    tmpCallListPlaylists2 (auth) {
-      const TTT = this
-      console.log('gapi', this.$gapi)
-      this.$gapi.client.init({
-        apiKey: apikeys.google_api_key,
-        // Your API key will be automatically added to the Discovery Document URLs.
-        discoveryDocs: ['https://people.googleapis.com/$discovery/rest'],
-        // clientId and scope are optional if auth is not required.
-        clientId: auth.clientId,
-        scope: 'profile'
-      }).then(function () {
-        // 3. Initialize and make the API request.
-        return TTT.$gapi.client.people.people.get({
-          resourceName: 'people/me',
-          'requestMask.includeField': 'person.names'
-        })
-      }).then(function (response) {
-        console.log(response.result)
-      }, function (reason) {
-        console.log('Error: ' + reason.result.error.message)
-      })
-    },
-    tmpCallListPlaylists (auth) {
-      console.log('calling list pl', auth)
-      const config = {
-        method: 'GET',
-        url: 'https://www.googleapis.com/youtube/v3/playlists',
-        data: { },
-        params: {
-          part: 'snippet,contentDetails',
-          mine: true
-        },
-        headers: {
-          Authorization: 'Bearer ' + auth.credential
-        }
-      }
-      console.log('config', config)
-      this.$axios(config).then(
-        (response) => {
-          console.log('RESP', response)
-        })
     }
   },
   mounted: function () {
