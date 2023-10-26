@@ -151,10 +151,58 @@ export default defineComponent({
           return
         }
       }
-      console.log('Sucessfully got playlists - now loading the items')
+      console.log('Successfully got playlists - now loading the items')
+      this.loadYtPlaylists({
+        callCounter: 0,
+        successFn: this.gotPlaylistItems,
+        errorFn: this.gotError
+      })
     },
     gotError (resp) {
       console.log('We got an error', resp)
+    },
+    loadYtPlaylists ({ callCounter, successFn, errorFn }) {
+      const TTT = this
+      // This will load the next unloaded playlist and when done will call itself.
+      //  if there are no unloaded playlists left then call successFn
+      if (callCounter > Object.keys(this.googlePlaylistData).length) {
+        errorFn({ msg: 'Error too many calls to load playlist' })
+        return
+      }
+      let nextUnloadedPlaylist
+
+      for (const pldkeyidx in Object.keys(this.googlePlaylistData)) {
+        const plditem = this.googlePlaylistData[Object.keys(this.googlePlaylistData)[pldkeyidx]]
+        if (typeof (plditem.playlistItems) === 'undefined') {
+          nextUnloadedPlaylist = plditem
+        }
+      }
+      if (typeof (nextUnloadedPlaylist) === 'undefined') {
+        // everything is loaded
+        successFn()
+        return
+      }
+
+      nextUnloadedPlaylist.playlistItems = []
+      googleApiHelpers.collectGoogleApiListResults({
+        collectionArray: nextUnloadedPlaylist.playlistItems,
+        apiFn: this.$gapi.client.youtube.playlistItems.list,
+        params: {
+          part: 'snippet,contentDetails',
+          playlist_id: nextUnloadedPlaylist.playlistData.id
+        },
+        errorCallback: errorFn,
+        sucessfullCompletionCallback: function () {
+          TTT.loadYtPlaylists({
+            callCounter: callCounter + 1,
+            successFn,
+            errorFn
+          })
+        }
+      })
+    },
+    gotPlaylistItems () {
+      console.log('All playlist items loaded... now what TODO', this.googlePlaylistData)
     }
   },
   mounted: function () {
