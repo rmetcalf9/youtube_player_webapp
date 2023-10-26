@@ -131,9 +131,8 @@ export default defineComponent({
       this.googlePlaylistData.watchLater.playlistItems = undefined
       this.googlePlaylistData.watchNow.playlistItems = undefined
       this.googlePlaylistData.longWatchLater.playlistItems = undefined
-
-      for (const key in Object.keys(this.googleplaylistresults[0])) {
-        const playlist = this.googleplaylistresults[0][key]
+      for (const key in Object.keys(this.googleplaylistresults)) {
+        const playlist = this.googleplaylistresults[key]
 
         for (const pldkeyidx in Object.keys(this.googlePlaylistData)) {
           const pldkey = Object.keys(this.googlePlaylistData)[pldkeyidx]

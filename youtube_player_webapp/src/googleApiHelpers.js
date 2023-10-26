@@ -5,7 +5,10 @@ function collectGoogleApiListResults ({ collectionArray, apiFn, params, errorCal
   params.maxResults = 50
   const request = apiFn(params)
   const successFunction = function (resp) {
-    collectionArray.push(resp.result.items)
+    resp.result.items.map(function (item) {
+      collectionArray.push(item)
+      return ''
+    })
     if (typeof (resp.result.nextPageToken) === 'undefined') {
       sucessfullCompletionCallback()
       return
