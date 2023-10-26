@@ -201,7 +201,34 @@ export default defineComponent({
       })
     },
     gotPlaylistItems () {
-      console.log('All playlist items loaded... now what TODO', this.googlePlaylistData)
+      for (const pldkeyidx in Object.keys(this.googlePlaylistData)) {
+        const plditem = this.googlePlaylistData[Object.keys(this.googlePlaylistData)[pldkeyidx]]
+        this.createAppplaylist({
+          name: plditem.nameToSearchFor
+        })
+        this.addAppplaylistItems({
+          playlistName: plditem.nameToSearchFor,
+          ytplaylist: plditem
+        })
+      }
+      const nowThenLaterAppPlaylistName = 'Now then Later'
+      this.createAppplaylist({
+        name: nowThenLaterAppPlaylistName
+      })
+      this.addAppplaylistItems({
+        playlistName: nowThenLaterAppPlaylistName,
+        ytplaylist: this.googlePlaylistData.watchNow
+      })
+      this.addAppplaylistItems({
+        playlistName: nowThenLaterAppPlaylistName,
+        ytplaylist: this.googlePlaylistData.watchLater
+      })
+    },
+    createAppplaylist ({ name }) {
+      console.log('TODO createAppplaylist - maybe directly call store', name)
+    },
+    addAppplaylistItems ({ playlistName, ytplaylist }) {
+      console.log('TODO addAppplaylistItems', playlistName, ytplaylist)
     }
   },
   mounted: function () {
