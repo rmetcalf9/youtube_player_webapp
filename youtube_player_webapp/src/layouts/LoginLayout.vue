@@ -58,6 +58,8 @@ import { defineComponent } from 'vue'
 import apikeys from '../apikey.js'
 import googleApiHelpers from '../googleApiHelpers.js'
 
+import { Loading } from 'quasar'
+
 window.handleCredentialResponse = (response) => {
   window.loginlayoutvuecomponent.loginCallback(response)
 }
@@ -96,15 +98,21 @@ export default defineComponent({
       this.autoriseWithGoogle()
     },
     autoriseWithGoogle () {
+      // See https://developers.google.com/identity/oauth2/web/guides/use-code-model#popup-mode
       const TTT = this
-      const client = window.google.accounts.oauth2.initTokenClient({
+      const client = window.google.accounts.oauth2.initCodeClient({
         client_id: '878288378696-8gb7jntrjdqljjk9fjfdc2io3ojtrrpg.apps.googleusercontent.com',
         scope: 'https://www.googleapis.com/auth/youtube',
         callback: (tokenResponse) => {
+          console.log('LF')
+          Loading.hide()
+          console.log('SSS', tokenResponse)
           TTT.$gapi.client.setApiKey(apikeys.google_api_key)
           TTT.$gapi.client.load('youtube', 'v3', TTT.scanGooglePlaylists)
         }
       })
+      console.log('LS')
+      Loading.show()
       client.requestAccessToken()
     },
     scanGooglePlaylists () {
